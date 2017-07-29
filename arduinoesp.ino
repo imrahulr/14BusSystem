@@ -57,7 +57,6 @@ void getStatus() {
        status_temp[i/3] = msg_recv[i]-48;  
     }
     updateStatus();
-    setupDisplay();
     msg_recv = "";
   }
    

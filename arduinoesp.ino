@@ -1,6 +1,12 @@
 #include <SoftwareSerial.h>
+#include <ShiftRegister74HC595.h>
 
 SoftwareSerial ESPserial(2, 3); // RX | TX
+
+// ShiftRegister74HC595 sr (numberOfShiftRegisters, serialDataPin, clockPin, latchPin); 
+ShiftRegister74HC595 sr1 (3, 4, 2, 3);
+ShiftRegister74HC595 sr2 (3, 7, 5, 6);
+
 
 long lastMsg = 0; 
 String msg_recv = "";
@@ -14,6 +20,23 @@ void updateStatus() {
     if (status_temp[i] >= 0 && status_temp[i] <=2) { 
       if (status_temp[i] != status_curr[i]) {
         status_curr[i] = status_temp[i];
+        if (status_curr[i] == 0) {
+          sr1.set(i, HIGH);
+          sr2.set(i, LOW);
+          delay(500);
+        } else if (status_curr[i] == 1) {
+          sr1.set(i, LOW);
+          sr2.set(i, LOW);  
+          delay(500);    
+        } else if (status_curr[i] == 2) {
+          sr1.set(i, LOW);
+          sr2.set(i, HIGH);
+          delay(500);
+        } else {
+          sr1.set(i, LOW);
+          sr2.set(i, LOW);
+          delay(500);            
+        }
       }
     }
   }
@@ -34,6 +57,7 @@ void getStatus() {
        status_temp[i/3] = msg_recv[i]-48;  
     }
     updateStatus();
+    setupDisplay();
     msg_recv = "";
   }
    
@@ -61,7 +85,10 @@ void setup() {
   Serial.begin(9600);
   ESPserial.begin(115200);   
   Serial.println("Ready");
-  
+  sr1.setAllLow();
+  sr2.setAllLow();
+  delay(5000);  
+
 }
 
 
@@ -69,7 +96,7 @@ void loop() {
   
   getStatus();
   long now = millis();
-  if (now - lastMsg > 5000) {
+  if (now - lastMsg > 20000) {
     lastMsg = now;
     sendStatus(); 
   }

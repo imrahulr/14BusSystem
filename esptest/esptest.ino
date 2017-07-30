@@ -45,7 +45,7 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str())) {
     //     Serial.println("connected");
-      client.subscribe("topic/fog");
+      client.subscribe("bus14/pub");
     } else {
     //     Serial.print("failed, rc=");
       delay(5000);
@@ -72,7 +72,7 @@ void loop() {
   if (Serial.available())   {
     data_send = Serial.readStringUntil('\n');
     if (data_send != "") {
-      client.publish("topic/data", (char *) data_send.c_str());  
+      client.publish("bus14/data", (char *) data_send.c_str());  
       data_send = "";
     }  
   }

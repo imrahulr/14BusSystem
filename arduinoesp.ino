@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 #include <ShiftRegister74HC595.h>
 
-SoftwareSerial ESPserial(2, 3); // RX | TX
+SoftwareSerial ESPserial(10, 11); // RX | TX
 
 // ShiftRegister74HC595 sr (numberOfShiftRegisters, serialDataPin, clockPin, latchPin); 
 ShiftRegister74HC595 sr1 (3, 4, 2, 3);
@@ -49,10 +49,10 @@ void getStatus() {
   if ( ESPserial.available() )   {
     msg_recv = "";
     msg_recv = ESPserial.readStringUntil('\n');
-    Serial.print("msg recv :");
+    Serial.print("Msg recv :");
     Serial.println(msg_recv);
   }  
-  if (msg_recv != "") {
+  if (msg_recv != "" && msg_recv[0] == "[") {
     for (int i=1; i<60; i=i+3) {
        status_temp[i/3] = msg_recv[i]-48;  
     }
@@ -95,7 +95,7 @@ void loop() {
   
   getStatus();
   long now = millis();
-  if (now - lastMsg > 20000) {
+  if (now - lastMsg > 5000) {
     lastMsg = now;
     sendStatus(); 
   }

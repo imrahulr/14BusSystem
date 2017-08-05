@@ -1,29 +1,28 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-const char* ssid = "rahul";
-const char* password = "123rsr##";
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
+
+
+const char* ssid = "";
+const char* password = "";
 const char* mqtt_server = "broker.hivemq.com";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
 String data_recv = "";
 String data_send = "";
+
 
 void setup_wifi() {
 
   delay(10);
-  //  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    //    Serial.print(".");
-  }
-
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("AutoConnectAP");
   randomSeed(micros());
-  //  Serial.println("WiFi connected");
-  //  Serial.println("IP address: ");
-  //  Serial.println(WiFi.localIP());
   
 }
 
@@ -40,14 +39,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   
   while (!client.connected()) {
-    //   Serial.print("Attempting MQTT connection...");
     String clientId = "ESP8266Client-";
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str())) {
-    //     Serial.println("connected");
+      //     Serial.println("connected");
       client.subscribe("bus14/pub");
     } else {
-    //     Serial.print("failed, rc=");
+      //     Serial.print("failed, rc=");
       delay(5000);
     }
   }
